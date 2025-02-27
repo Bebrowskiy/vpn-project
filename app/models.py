@@ -1,22 +1,20 @@
 from sqlalchemy import Column, Integer, String
-from .database import Base
-from .security import hash_password, verify_password
+from app.database import Base
+
+class VPNUser(Base):
+    """Модель пользователя VPN"""
+    __tablename__ = "vpn_users"
+
+    id = Column(Integer, primary_key=True, index=True)
+    username = Column(String, unique=True, index=True)
+    private_key = Column(String, unique=True, nullable=False)
+    public_key = Column(String, unique=True, nullable=False)
+    ip_address = Column(String, unique=True, nullable=False)
 
 class User(Base):
-    __tablename__ = "users"  # Название таблицы в базе данных
+    """Модель пользователя"""
+    __tablename__ = "users"
 
-    id = Column(Integer, primary_key=True, index=True)  # Уникальный идентификатор пользователя
-    username = Column(String, unique=True, index=True)  # Имя пользователя (уникальное)
-    email = Column(String, unique=True, index=True)  # Электронная почта пользователя (уникальная)
-    hashed_password = Column(String)  # Хэшированный пароль
-
-    def __repr__(self):
-        return f"<User {self.username}>"  # Представление объекта пользователя
-
-    # Метод для установки пароля (хэширует пароль перед сохранением)
-    def set_password(self, password: str):
-        self.hashed_password = hash_password(password)
-
-    # Метод для проверки пароля
-    def check_password(self, password: str):
-        return verify_password(password, self.hashed_password)
+    id = Column(Integer, primary_key=True, index=True)
+    username = Column(String, unique=True, index=True)
+    hashed_password = Column(String, nullable=False)

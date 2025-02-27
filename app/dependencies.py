@@ -1,31 +1,25 @@
-from sqlalchemy.orm import Session
+from fastapi.security import OAuth2PasswordBearer
 from fastapi import Depends, HTTPException
-from .database import SessionLocal
-from . import crud, models, security
-from .auth import oauth2_scheme  # Импортируем oauth2_scheme из main.py
+from jose import JWTError, jwt
+from sqlalchemy.orm import Session
+from app import models, database
+from app.config import SECRET_KEY, ALGORITHM
 
-# Получение базы данных через зависимость
-def get_db():
-    db = SessionLocal()  # Создаем объект сессии базы данных
+oauth2_scheme = OAuth2PasswordBearer(tokenUrl="login")
+
+def get_current_user(token: str = Depends(oauth2_scheme), db: Session = Depends(database.get_db)):
+    """Получает текущего пользователя по токену"""
+
     try:
-        yield db
-    finally:
-        db.close()  # Закрываем сессию после использования
-
-# Проверка текущего пользователя по токену
-def get_current_user(token: str = Depends(oauth2_scheme), db: Session = Depends(get_db)):
-    credentials_exception = HTTPException(
-        status_code=401,
-        detail="Could not validate credentials",
-        headers={"WWW-Authenticate": "Bearer"},
-    )
-    payload = security.verify_token(token)  # Проверяем токен
-    if payload is None:
-        raise credentials_exception  # Если токен недействителен, выбрасываем ошибку
-    username: str = payload.get("sub")  # Получаем имя пользователя из токена
-    if username is None:
-        raise credentials_exception  # Если в токене нет имени пользователя, выбрасываем ошибку
-    user = crud.get_user_by_username(db, username=username)  # Получаем пользователя из базы данных
+        payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
+        username: str = payload.get("sub")
+        if username is None:
+            raise HTTPException(status_code=401, detail="Неверный токен")
+    except JWTError:
+        raise HTTPException(status_code=401, detail="Неверный токен")
+    
+    user = db.query(models.User).filter(models.User.username == username).first()
     if user is None:
-        raise credentials_exception  # Если пользователь не найден, выбрасываем ошибку
-    return user  # Возвращаем текущего пользователя
+        raise HTTPException(status_code=401, detail="Пользователь не найден")
+
+    return user

@@ -1,15 +1,17 @@
-from sqlalchemy import create_engine
+from sqlalchemy import create_engine, Column, Integer, String
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker
 
-# Указываем URL для подключения к базе данных, например, для SQLite
-DATABASE_URL = "sqlite:///./test.db"  # Здесь можно использовать другую БД, если нужно
+DATABASE_URL = "sqlite:///./vpn_users.db"
 
-# Инициализация объекта engine
-engine = create_engine(DATABASE_URL, connect_args={"check_same_thread": False})  # Для SQLite
-
-# Создание базового класса для моделей
+engine = create_engine(DATABASE_URL, connect_args={"check_same_thread": False})
+SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 Base = declarative_base()
 
-# Создание сессии
-SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
+def get_db():
+    """Функция для получения сессии базы данных"""
+    db = SessionLocal()
+    try:
+        yield db
+    finally:
+        db.close()
