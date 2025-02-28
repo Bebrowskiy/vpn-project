@@ -20,34 +20,20 @@ class _RegisterScreenState extends State<RegisterScreen> {
 
     // Валидация данных
     if (username.isEmpty || email.isEmpty || password.isEmpty) {
-      // Показываем ошибку, если одно из полей пустое
-      showDialog(
-        context: context,
-        builder: (context) => AlertDialog(
-          title: Text('Ошибка'),
-          content: Text('Пожалуйста, заполните все поля'),
-          actions: [
-            TextButton(
-              onPressed: () => Navigator.pop(context),
-              child: Text('OK'),
-            ),
-          ],
-        ),
-      );
+      _showDialog('Ошибка', 'Пожалуйста, заполните все поля');
       return;
     }
 
-    // Формируем данные для отправки на сервер
+    // Формируем данные для отправки
     final Map<String, String> userData = {
       'username': username,
       'email': email,
       'password': password,
     };
 
-    final uri = Uri.parse('http://192.168.0.54:8000/api/register');  // Указание адреса сервера
+    final uri = Uri.parse('http://192.168.0.54:8000/api/register'); // Адрес сервера
 
     try {
-      // Отправляем данные на сервер
       final response = await http.post(
         uri,
         headers: {'Content-Type': 'application/json'},
@@ -56,86 +42,64 @@ class _RegisterScreenState extends State<RegisterScreen> {
 
       if (response.statusCode == 200) {
         final responseData = json.decode(response.body);
-        final accessToken = responseData['access_token'];
-        print('Токен: $accessToken'); // Выводим токен, если нужно
+        print('Токен: ${responseData['access_token']}'); // Можно сохранить токен
 
-        // Можно сохранить токен в SharedPreferences или в другом месте для дальнейшего использования
-
-        showDialog(
-          context: context,
-          builder: (context) => AlertDialog(
-            title: Text('Успех'),
-            content: Text('Пользователь зарегистрирован'),
-            actions: [
-              TextButton(
-                onPressed: () => Navigator.pop(context),
-                child: Text('OK'),
-              ),
-            ],
-          ),
-        );
+        // Показываем сообщение об успешной регистрации
+        _showDialog('Успех', 'Регистрация успешна! Перенаправление...', onClose: () {
+          Navigator.pushReplacementNamed(context, '/'); // Перенаправление на экран входа
+        });
       } else {
-        throw Exception('Не удалось зарегистрировать пользователя');
+        _showDialog('Ошибка', 'Не удалось зарегистрировать пользователя');
       }
     } catch (e) {
-      showDialog(
-        context: context,
-        builder: (context) => AlertDialog(
-          title: Text('Ошибка'),
-          content: Text('Произошла ошибка при регистрации: $e'),
-          actions: [
-            TextButton(
-              onPressed: () => Navigator.pop(context),
-              child: Text('OK'),
-            ),
-          ],
-        ),
-      );
+      _showDialog('Ошибка', 'Произошла ошибка: $e');
     }
+  }
+
+  // Метод для отображения диалогового окна
+  void _showDialog(String title, String message, {VoidCallback? onClose}) {
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: Text(title),
+        content: Text(message),
+        actions: [
+          TextButton(
+            onPressed: () {
+              Navigator.pop(context);
+              if (onClose != null) onClose(); // Если передана функция, выполняем её
+            },
+            child: Text('OK'),
+          ),
+        ],
+      ),
+    );
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: Text('Регистрация'),
-      ),
+      appBar: AppBar(title: Text('Регистрация')),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
         child: Column(
           children: [
-            // Поле для ввода имени пользователя
             TextField(
               controller: _usernameController,
-              decoration: InputDecoration(
-                labelText: 'Имя пользователя',
-                border: OutlineInputBorder(),
-              ),
+              decoration: InputDecoration(labelText: 'Имя пользователя', border: OutlineInputBorder()),
             ),
             SizedBox(height: 16),
-
-            // Поле для ввода электронной почты
             TextField(
               controller: _emailController,
-              decoration: InputDecoration(
-                labelText: 'Электронная почта',
-                border: OutlineInputBorder(),
-              ),
+              decoration: InputDecoration(labelText: 'Электронная почта', border: OutlineInputBorder()),
             ),
             SizedBox(height: 16),
-
-            // Поле для ввода пароля
             TextField(
               controller: _passwordController,
-              obscureText: true,  // Скрыть текст пароля
-              decoration: InputDecoration(
-                labelText: 'Пароль',
-                border: OutlineInputBorder(),
-              ),
+              obscureText: true,
+              decoration: InputDecoration(labelText: 'Пароль', border: OutlineInputBorder()),
             ),
             SizedBox(height: 16),
-
-            // Кнопка для отправки данных регистрации
             ElevatedButton(
               onPressed: register,
               child: Text('Зарегистрироваться'),
