@@ -27,7 +27,7 @@ def get_vpn_user(db: Session, username: str):
 def create_user(db: Session, user: schemas.UserCreate):
     """Создаёт нового пользователя"""
     hashed_password = hash_password(user.password)
-    db_user = models.User(username=user.username, hashed_password=hashed_password)
+    db_user = models.User(username=user.username, email=user.email, hashed_password=hashed_password)
     db.add(db_user)
     db.commit()
     db.refresh(db_user)
