@@ -1,6 +1,6 @@
 from fastapi import FastAPI
 from app.database import Base, engine
-from app.routers import vpn, auth
+from app.routers import auth, vpn
 
 # Создание таблиц в БД
 Base.metadata.create_all(bind=engine)

@@ -1,5 +1,84 @@
-.venv
-.idea
-__pycache__
-vpn_users.db
-web_app
+# Flutter/Dart
+.dart_tool/
+.packages
+.pub-cache/
+.pub/
+build/
+.flutter-plugins
+.flutter-plugins-dependencies
+.fvm/flutter_sdk/
+
+# Android
+android/gradle/
+android/.gradle/
+android/app/release/
+android/app/debug/
+android/app/build/
+android/local.properties
+
+# iOS
+ios/.generated/
+ios/Flutter/Flutter.framework/
+ios/Flutter/Flutter.podspec
+ios/Flutter/AppFrameworkInfo.plist
+ios/Flutter/Debug.xcconfig
+ios/Flutter/Release.xcconfig
+ios/Flutter/Generated.xcconfig
+ios/Flutter/app.flx
+ios/Flutter/app.zip
+ios/Flutter/flutter_assets/
+ios/Flutter/flutter_export_environment.sh
+ios/ServiceDefinitions.json
+ios/Runner/GeneratedPluginRegistrant.*
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+env/
+venv/
+ENV/
+env.bak/
+venv.bak/
+*.sqlite3
+*.db
+*.sql
+*.sqlite
+
+# VS Code
+.vscode/*
+!.vscode/settings.json
+!.vscode/tasks.json
+!.vscode/launch.json
+!.vscode/extensions.json
+
+# IntelliJ
+.idea/
+*.iml
+*.iws
+*.ipr
+*.swp
+*.swo
+
+# Environment variables
+.env
+.env.*
+!.env.example
+
+# OS generated files
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+# Logs
+logs/
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
